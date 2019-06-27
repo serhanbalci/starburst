@@ -1,6 +1,6 @@
-class CreateUsers < ActiveRecord::Migration
+class CreateAdminUsers < ActiveRecord::Migration
 	def change
-		create_table :users do |t|
+		create_table :admin_users do |t|
 			t.string :subscription
 			t.timestamps
 		end

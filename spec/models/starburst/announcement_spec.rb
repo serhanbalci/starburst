@@ -54,73 +54,73 @@ describe Announcement do
 
   end
 
-  context "an announcement not yet read by the current user" do
+  context "an announcement not yet read by the current admin_user" do
 
     it "shows up" do
       read_announcement = Announcement.create(:body => "test", :start_delivering_at => 1.day.ago)
       unread_announcement = Announcement.create(:body => "test", :start_delivering_at => Time.current)
-      user_who_read_announcement = FactoryGirl.create(:user)
-      AnnouncementView.create(:announcement => read_announcement, :user => user_who_read_announcement)
-      expect(Announcement.unread_by(user_who_read_announcement)).to eq [unread_announcement]
+      admin_user_who_read_announcement = FactoryGirl.create(:admin_user)
+      AnnouncementView.create(:announcement => read_announcement, :admin_user => admin_user_who_read_announcement)
+      expect(Announcement.unread_by(admin_user_who_read_announcement)).to eq [unread_announcement]
     end
 
-    it "shows up for the current user even when others have read it" do
+    it "shows up for the current admin_user even when others have read it" do
       read_announcement = Announcement.create(:body => "test", :start_delivering_at => 1.day.ago)
       unread_announcement = Announcement.create(:body => "test", :start_delivering_at => Time.current)
-      user_who_read_announcement = FactoryGirl.create(:user)
-      user_who_read_no_announcements = FactoryGirl.create(:user)
-      AnnouncementView.create(:announcement => read_announcement, :user => user_who_read_announcement)
-      expect(Announcement.unread_by(user_who_read_no_announcements)).to include(unread_announcement, read_announcement)
+      admin_user_who_read_announcement = FactoryGirl.create(:admin_user)
+      admin_user_who_read_no_announcements = FactoryGirl.create(:admin_user)
+      AnnouncementView.create(:announcement => read_announcement, :admin_user => admin_user_who_read_announcement)
+      expect(Announcement.unread_by(admin_user_who_read_no_announcements)).to include(unread_announcement, read_announcement)
     end
 
-  it "shows up for the current user even when they have read other announcements" do
+  it "shows up for the current admin_user even when they have read other announcements" do
       read_announcement = Announcement.create(:body => "test", :start_delivering_at => 1.day.ago)
       unread_announcement = Announcement.create(:body => "test", :start_delivering_at => Time.current)
-      user_who_read_announcement = FactoryGirl.create(:user)
-      AnnouncementView.create(:announcement => read_announcement, :user => user_who_read_announcement)
-      expect(Starburst::Announcement.current(user_who_read_announcement)).to eq unread_announcement
+      admin_user_who_read_announcement = FactoryGirl.create(:admin_user)
+      AnnouncementView.create(:announcement => read_announcement, :admin_user => admin_user_who_read_announcement)
+      expect(Starburst::Announcement.current(admin_user_who_read_announcement)).to eq unread_announcement
     end
 
 
   end
 
-  context "an announcement targeted to certain users" do
-    it "has a limited_to_users field that is retrieveable from the database" do
-      limited_announcement = Announcement.create(:body => "test", :limit_to_users => [
+  context "an announcement targeted to certain admin_users" do
+    it "has a limited_to_admin_users field that is retrieveable from the database" do
+      limited_announcement = Announcement.create(:body => "test", :limit_to_admin_users => [
         {
           :field => "subscription",
           :value => "",
           :operator => "="
         }
       ])
-      expect(limited_announcement.limit_to_users[0][:field]).to eq "subscription"
+      expect(limited_announcement.limit_to_admin_users[0][:field]).to eq "subscription"
     end
 
-    it "shows up for the proper user only (one positive condition)" do
-      limited_announcement = Announcement.create(:body => "test", :limit_to_users => [
+    it "shows up for the proper admin_user only (one positive condition)" do
+      limited_announcement = Announcement.create(:body => "test", :limit_to_admin_users => [
         {
           :field => "subscription",
           :value => ""
         }
       ])
-      user_who_should_see_announcement = FactoryGirl.create(:user, :subscription => "")
-      user_who_should_not_see_announcement = FactoryGirl.create(:user, :subscription => "monthly")
-      expect(Announcement.find_announcement_for_current_user(Announcement.where(nil), user_who_should_see_announcement)).to eq limited_announcement
-      expect(Announcement.find_announcement_for_current_user(Announcement.where(nil), user_who_should_not_see_announcement)).to eq nil
+      admin_user_who_should_see_announcement = FactoryGirl.create(:admin_user, :subscription => "")
+      admin_user_who_should_not_see_announcement = FactoryGirl.create(:admin_user, :subscription => "monthly")
+      expect(Announcement.find_announcement_for_current_admin_user(Announcement.where(nil), admin_user_who_should_see_announcement)).to eq limited_announcement
+      expect(Announcement.find_announcement_for_current_admin_user(Announcement.where(nil), admin_user_who_should_not_see_announcement)).to eq nil
     end
 
-    it "shows up for the proper user only (method condition)" do
-      Starburst.user_instance_methods = ["free?"]
-      limited_announcement = Announcement.create(:body => "test", :limit_to_users => [
+    it "shows up for the proper admin_user only (method condition)" do
+      Starburst.admin_user_instance_methods = ["free?"]
+      limited_announcement = Announcement.create(:body => "test", :limit_to_admin_users => [
         {
           :field => "free?",
           :value => true
         }
       ])
-      user_who_should_see_announcement = FactoryGirl.create(:user, :subscription => "")
-      user_who_should_not_see_announcement = FactoryGirl.create(:user, :subscription => "monthly")
-      expect(Announcement.find_announcement_for_current_user(Announcement.where(nil), user_who_should_see_announcement)).to eq limited_announcement
-      expect(Announcement.find_announcement_for_current_user(Announcement.where(nil), user_who_should_not_see_announcement)).to eq nil
+      admin_user_who_should_see_announcement = FactoryGirl.create(:admin_user, :subscription => "")
+      admin_user_who_should_not_see_announcement = FactoryGirl.create(:admin_user, :subscription => "monthly")
+      expect(Announcement.find_announcement_for_current_admin_user(Announcement.where(nil), admin_user_who_should_see_announcement)).to eq limited_announcement
+      expect(Announcement.find_announcement_for_current_admin_user(Announcement.where(nil), admin_user_who_should_not_see_announcement)).to eq nil
     end
 
     # it "performs" do
@@ -128,7 +128,7 @@ describe Announcement do
     #   require 'benchmark'
 
     #   (1 .. 500).each do
-    #     Announcement.create(:limit_to_users => [
+    #     Announcement.create(:limit_to_admin_users => [
     #       {
     #         :field => "subscription",
     #         :value => ""
@@ -137,11 +137,11 @@ describe Announcement do
     #   end
 
     #   (1 .. 10000).each do
-    #     create(:user, :subscription => "")
+    #     create(:admin_user, :subscription => "")
     #   end
 
     #   Benchmark.realtime{
-    #   Announcement.current(User.last)
+    #   Announcement.current(admin_user.last)
     #   }
     # end
 

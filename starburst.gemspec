@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Corey Martin"]
   s.email       = ["coreym@gmail.com"]
   s.homepage    = "http://github.com/csm123/starburst"
-  s.summary     = "One-time messages to users in your app"
-  s.description = "Show one-time messages to users in your Rails app"
+  s.summary     = "One-time messages to admin_users in your app"
+  s.description = "Show one-time messages to admin_users in your Rails app"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]

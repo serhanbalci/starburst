@@ -1,7 +1,7 @@
 class CreateAnnouncementTables < ActiveRecord::Migration
 	def change
 		create_table :starburst_announcement_views do |t|
-			t.integer :user_id
+			t.integer :admin_user_id
 			t.integer :announcement_id
 			t.timestamps
 		end
@@ -10,7 +10,7 @@ class CreateAnnouncementTables < ActiveRecord::Migration
 			t.text :body
 			t.datetime :start_delivering_at
 			t.datetime :stop_delivering_at
-			t.text :limit_to_users
+			t.text :limit_to_admin_users
 			t.timestamps
 		end
 	end

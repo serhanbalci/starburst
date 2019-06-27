@@ -7,8 +7,8 @@ module Starburst
 		routes { Starburst::Engine.routes } # http://pivotallabs.com/writing-rails-engine-rspec-controller-tests/
 
 		it "marks an announcement as read (twice)" do
-			current_user = instance_double(User, id: 10)
-			controller.stub(:current_user).and_return(current_user)
+			current_admin_user = instance_double(admin_user, id: 10)
+			controller.stub(:current_admin_user).and_return(current_admin_user)
 			announcement = FactoryGirl.create(:announcement)
 			announcement2 = FactoryGirl.create(:announcement)
 			if Rails::VERSION::MAJOR < 5
@@ -17,7 +17,7 @@ module Starburst
 				post :mark_as_read, params: { id: announcement.id }
 			end
 			expect(response.status).to eq 200
-			expect(AnnouncementView.last.user_id).to eq 10
+			expect(AnnouncementView.last.admin_user_id).to eq 10
 			expect(AnnouncementView.all.length).to eq 1
 			if Rails::VERSION::MAJOR < 5
 				post :mark_as_read, id: announcement2.id
@@ -25,12 +25,12 @@ module Starburst
 				post :mark_as_read, params: { id: announcement2.id }
 			end
 			expect(response.status).to eq 200
-			expect(AnnouncementView.last.user_id).to eq 10
+			expect(AnnouncementView.last.admin_user_id).to eq 10
 			expect(AnnouncementView.all.length).to eq 2
 		end
 
 		it "does not mark an announcement as read if no one is logged in" do
-			controller.stub(:current_user).and_return(nil)
+			controller.stub(:current_admin_user).and_return(nil)
 			announcement = FactoryGirl.create(:announcement)
 			if Rails::VERSION::MAJOR < 5
 				post :mark_as_read, id: announcement.id
