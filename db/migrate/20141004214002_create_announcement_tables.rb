@@ -1,4 +1,4 @@
-class CreateAnnouncementTables < ActiveRecord::Migration
+class CreateAnnouncementTables < ActiveRecord::Migration[5.2]
 	def change
 		create_table :starburst_announcement_views do |t|
 			t.integer :admin_user_id
